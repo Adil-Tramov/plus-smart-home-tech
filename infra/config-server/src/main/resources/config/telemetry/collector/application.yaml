@@ -1,0 +1,18 @@
+logging:
+  level:
+    ru.yandex.practicum: debug
+    root: info
+
+grpc:
+  server:
+    port: 0
+
+server:
+  port: 0
+
+kafka:
+  topic:
+    hub: telemetry.hubs.v1
+    sensor: telemetry.sensors.v1
+  bootstrap:
+    server: localhost:9092

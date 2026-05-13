@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    driverClassName: "org.postgresql.Driver"
+    url: "jdbc:postgresql://localhost:5433/smarthome"
+    username: "postgres"
+    password: "postgres"
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        default_schema: delivery
+
+logging:
+  level:
+    ru.yandex.practicum: debug
+    root: info
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
+
+server:
+  port: 0
