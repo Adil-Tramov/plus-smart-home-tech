@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-package telemetry.messages.event;
+package telemetry.messages;
 
 import "google/protobuf/timestamp.proto";
 
 option java_multiple_files = true;
-option java_package = "ru.yandex.practicum.grpc.telemetry.event";
+option java_package = "telemetry.service.event";
 
 message HubEventProto {
   string hub_id = 1;
@@ -28,7 +28,7 @@ enum DeviceTypeProto {
 
 message DeviceAddedEventProto {
   string id = 1;
-  DeviceTypeProto device_type = 2;
+  DeviceTypeProto type = 2;
 }
 
 message DeviceRemovedEventProto {
@@ -83,7 +83,7 @@ message ScenarioRemovedEventProto {
   string name = 1;
 }
 
-message DeviceActionRequest {
+message DeviceActionRequestProto {
   string hub_id = 1;
   string scenario_name = 2;
   DeviceActionProto action = 3;
