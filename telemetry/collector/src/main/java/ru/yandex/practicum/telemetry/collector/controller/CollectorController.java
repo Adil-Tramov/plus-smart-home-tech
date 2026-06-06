@@ -7,9 +7,7 @@ import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.apache.avro.specific.SpecificRecordBase;
-import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import ru.yandex.practicum.telemetry.collector.client.KafkaProducerConfig;
 import ru.yandex.practicum.telemetry.collector.handler.hub.HubEventHandler;
 import ru.yandex.practicum.telemetry.collector.handler.sensors.SensorEventHandler;
@@ -19,7 +17,6 @@ import telemetry.service.event.SensorEventProto;
 
 import java.time.Duration;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
