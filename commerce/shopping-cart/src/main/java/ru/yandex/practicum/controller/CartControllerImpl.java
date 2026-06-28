@@ -58,8 +58,8 @@ public class CartControllerImpl implements CartController {
     @Loggable
     @PostMapping("/remove")
     public ShoppingCartDto removeProductFromCart(@RequestParam @NotNull String username,
-                                                 @RequestBody List<@NotNull UUID> productId) {
-        ShoppingCart shoppingCart = cartService.removeProductFromCart(username, productId);
+                                                 @RequestBody List<@NotNull UUID> products) {
+        ShoppingCart shoppingCart = cartService.removeProductFromCart(username, products);
         return shoppingCartMapper.toDto(shoppingCart);
     }
 
