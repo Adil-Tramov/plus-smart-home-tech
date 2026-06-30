@@ -1,6 +1,6 @@
 package ru.yandex.practicum.service;
 
-import ru.yandex.practicum.model.ShoppingCart;
+import ru.yandex.practicum.dto.ShoppingCartDto;
 
 import java.util.List;
 import java.util.Map;
