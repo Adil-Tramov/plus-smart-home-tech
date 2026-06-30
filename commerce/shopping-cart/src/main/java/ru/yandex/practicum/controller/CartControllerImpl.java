@@ -33,8 +33,7 @@ public class CartControllerImpl implements CartController {
     @Loggable
     @GetMapping
     public ShoppingCartDto getShoppingCart(@RequestParam @NotNull String username) {
-        ShoppingCart shoppingCart = cartService.getUserProductCart(username);
-        return shoppingCartMapper.toDto(shoppingCart);
+        return cartService.getUserProductCart(username);
     }
 
     @Loggable
@@ -44,33 +43,24 @@ public class CartControllerImpl implements CartController {
         ShoppingCartDto shoppingCartDto = ShoppingCartDto.builder()
                 .products(productCart)
                 .build();
-        BookedProductsDto bookedProductsDto = warehouseControllerFeign.checkAvailableAllProductInShoppingCart(shoppingCartDto);
-        ShoppingCart shoppingCart = cartService.putProductInCart(username, productCart);
-        return shoppingCartMapper.toDto(shoppingCart);
-    }
-
-    @Loggable
-    @DeleteMapping
-    public void deleteShoppingCart(@RequestParam @NotNull String username) {
-        cartService.deleteShoppingCart(username);
+        warehouseControllerFeign.checkAvailableAllProductInShoppingCart(shoppingCartDto);
+        return cartService.putProductInCart(username, productCart);
     }
 
     @Loggable
     @PostMapping("/remove")
     public ShoppingCartDto removeProductFromCart(@RequestParam @NotNull String username,
                                                  @RequestBody List<@NotNull UUID> products) {
-        ShoppingCart shoppingCart = cartService.removeProductFromCart(username, products);
-        return shoppingCartMapper.toDto(shoppingCart);
+        return cartService.removeProductFromCart(username, products);
     }
 
     @Loggable
     @PostMapping("/change-quantity")
     public ShoppingCartDto changeProductQuantityInCart(@RequestParam @NotNull String username,
                                                        @RequestBody ChangeProductQuantityRequest request) {
-        ShoppingCart shoppingCart = cartService.changeQuantityInShoppingCart(username,
+        return cartService.changeQuantityInShoppingCart(username,
                 request.getProductId(),
                 request.getNewQuantity());
-        return shoppingCartMapper.toDto(shoppingCart);
     }
 
 }
