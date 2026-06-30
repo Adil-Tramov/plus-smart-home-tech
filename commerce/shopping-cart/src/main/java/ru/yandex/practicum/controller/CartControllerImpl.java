@@ -12,8 +12,6 @@ import ru.yandex.practicum.dto.BookedProductsDto;
 import ru.yandex.practicum.dto.ChangeProductQuantityRequest;
 import ru.yandex.practicum.dto.ShoppingCartDto;
 import ru.yandex.practicum.logging.Loggable;
-import ru.yandex.practicum.model.ShoppingCart;
-import ru.yandex.practicum.model.mapper.ShoppingCartMapper;
 import ru.yandex.practicum.service.CartService;
 
 import java.util.List;
@@ -28,15 +26,16 @@ import java.util.UUID;
 public class CartControllerImpl implements CartController {
     private final CartService cartService;
     private final WarehouseControllerFeign warehouseControllerFeign;
-    private final ShoppingCartMapper shoppingCartMapper;
 
     @Loggable
+    @Override
     @GetMapping
     public ShoppingCartDto getShoppingCart(@RequestParam @NotNull String username) {
         return cartService.getUserProductCart(username);
     }
 
     @Loggable
+    @Override
     @PutMapping
     public ShoppingCartDto putProductInCart(@RequestParam @NotNull String username,
                                             @RequestBody Map<@NotNull UUID, @PositiveOrZero Integer> productCart) {
@@ -48,6 +47,14 @@ public class CartControllerImpl implements CartController {
     }
 
     @Loggable
+    @Override
+    @DeleteMapping
+    public void deleteShoppingCart(@RequestParam @NotNull String username) {
+        cartService.deleteShoppingCart(username);
+    }
+
+    @Loggable
+    @Override
     @PostMapping("/remove")
     public ShoppingCartDto removeProductFromCart(@RequestParam @NotNull String username,
                                                  @RequestBody List<@NotNull UUID> products) {
@@ -55,6 +62,7 @@ public class CartControllerImpl implements CartController {
     }
 
     @Loggable
+    @Override
     @PostMapping("/change-quantity")
     public ShoppingCartDto changeProductQuantityInCart(@RequestParam @NotNull String username,
                                                        @RequestBody ChangeProductQuantityRequest request) {
@@ -62,5 +70,4 @@ public class CartControllerImpl implements CartController {
                 request.getProductId(),
                 request.getNewQuantity());
     }
-
 }
