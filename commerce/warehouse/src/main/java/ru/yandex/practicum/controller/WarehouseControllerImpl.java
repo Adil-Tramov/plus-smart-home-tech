@@ -1,10 +1,13 @@
 package ru.yandex.practicum.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.controller.order.feign.OrderControllerFeign;
 import ru.yandex.practicum.controller.warehouse.WarehouseController;
 import ru.yandex.practicum.dto.*;
 import ru.yandex.practicum.logging.Loggable;
@@ -16,6 +19,9 @@ import ru.yandex.practicum.model.mapper.BookedProductsMapper;
 import ru.yandex.practicum.model.mapper.ProductMapper;
 import ru.yandex.practicum.service.WarehouseService;
 
+import java.util.Map;
+import java.util.UUID;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/warehouse")
@@ -26,6 +32,7 @@ public class WarehouseControllerImpl implements WarehouseController {
     private final AddressMapper addressMapper;
     private final ProductMapper productMapper;
     private final BookedProductsMapper bookedProductsMapper;
+    private final OrderControllerFeign orderControllerFeign;
 
     @Loggable
     @PutMapping
@@ -52,5 +59,21 @@ public class WarehouseControllerImpl implements WarehouseController {
     public AddressDto getWarehouseAddress() {
         Address address = warehouseService.getWarehouseAddress();
         return addressMapper.toDto(address);
+    }
+
+    @PostMapping("/shipped")
+    public void shippedInDelivery(@RequestBody @Valid ShippedToDeliveryRequest request) {
+        warehouseService.shippedInDelivery(request.getOrderId(), request.getDeliveryId());
+    }
+
+    @PostMapping("/return")
+    public void returnProductsInWarehous(@RequestBody Map<@NotNull UUID, @PositiveOrZero Integer> products) {
+        warehouseService.returnProductsInWarehous(products);
+    }
+
+    @PostMapping("/assembly")
+    public BookedProductsDto assemblyProductsForDelivery(@RequestBody @Valid AssemblyProductsForOrderRequest request) {
+        BookedProducts bookedProducts = warehouseService.assemblyProductsForDelivery(request.getProducts());
+        return bookedProductsMapper.toDto(bookedProducts);
     }
 }

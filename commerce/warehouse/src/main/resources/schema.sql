@@ -7,3 +7,8 @@ CREATE TABLE IF NOT EXISTS Warehouse (
     weight DOUBLE PRECISION NOT NULL CHECK (weight >= 1.0),
     quantity INTEGER NOT NULL CHECK (quantity >= 0.0)
 );
+
+CREATE TABLE IF NOT EXISTS Shipped (
+    order_id UUID PRIMARY KEY,
+    delivery_id UUID NOT NULL
+);
