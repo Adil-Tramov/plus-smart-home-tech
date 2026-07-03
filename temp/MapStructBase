@@ -1,0 +1,14 @@
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
+        uses = {AddressMapper.class, DeliveryStateMapper.class})
+public interface DeliveryMapper {
+
+    @Mapping(target = "fromAddress", source = "fromAddress")
+    @Mapping(target = "toAddress", source = "toAddress")
+    @Mapping(target = "deliveryState", source = "deliveryState")
+    Delivery toEntity(DeliveryDto deliveryDto);
+
+    @Mapping(target = "fromAddress", source = "fromAddress")
+    @Mapping(target = "toAddress", source = "toAddress")
+    @Mapping(target = "deliveryState", source = "deliveryState")
+    DeliveryDto toDto(Delivery delivery);
+}
