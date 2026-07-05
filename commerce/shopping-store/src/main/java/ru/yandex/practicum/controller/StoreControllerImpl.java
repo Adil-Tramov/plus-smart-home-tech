@@ -23,7 +23,6 @@ import ru.yandex.practicum.model.mapper.ProductMapper;
 import ru.yandex.practicum.model.mapper.QuantityStateMapper;
 import ru.yandex.practicum.service.StoreService;
 
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -45,15 +44,6 @@ public class StoreControllerImpl implements StoreController {
         ProductCategory productCategory = productCategoryMapper.toEntity(category);
         Page<Product> products = storeService.getListOfProducts(productCategory, pageable);
         return products.map(productMapper::toDto);
-    }
-
-    @Loggable
-    @PostMapping("/getAll")
-    public List<ProductDto> getAllProductsFromList(@RequestBody List<UUID> productsId) {
-        List<Product> products = storeService.getAllProductsFromList(productsId);
-        return products.stream()
-                .map(productMapper::toDto)
-                .toList();
     }
 
     @Loggable
