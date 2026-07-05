@@ -6,7 +6,6 @@ import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.model.ProductCategory;
 import ru.yandex.practicum.model.QuantityState;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface StoreService {
@@ -23,6 +22,4 @@ public interface StoreService {
 
     Page<Product> getListOfProducts(ProductCategory category,
                                     Pageable pageable);
-
-    List<Product> getAllProductsFromList(List<UUID> productsId);
 }

@@ -11,7 +11,6 @@ import ru.yandex.practicum.dto.ProductCategoryDto;
 import ru.yandex.practicum.dto.ProductDto;
 import ru.yandex.practicum.dto.QuantityStateDto;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface StoreController {
@@ -20,9 +19,6 @@ public interface StoreController {
     Page<ProductDto> getListOfProducts(@RequestParam ProductCategoryDto category,
                                        @PageableDefault(size = 20, sort = "productName",
                                                direction = Sort.Direction.ASC) Pageable pageable);
-
-    @PostMapping("/getAll")
-    List<ProductDto> getAllProductsFromList(@RequestBody List<UUID> productsId);
 
     @PutMapping
     ProductDto createNewProduct(@RequestBody @Valid ProductDto product);

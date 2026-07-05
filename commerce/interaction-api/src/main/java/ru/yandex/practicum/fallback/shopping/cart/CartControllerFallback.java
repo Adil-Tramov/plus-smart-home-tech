@@ -32,7 +32,7 @@ public class CartControllerFallback implements CartControllerFeign {
 
     @Override
     public ShoppingCartDto removeProductFromCart(@RequestParam String username,
-                                                 @RequestBody List<UUID> productId) {
+                                                 @RequestBody List<UUID> products) {
         return null;
     }
 
