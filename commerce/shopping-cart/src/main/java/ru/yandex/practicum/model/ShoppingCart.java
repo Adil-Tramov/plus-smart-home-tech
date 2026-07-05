@@ -2,13 +2,12 @@ package ru.yandex.practicum.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.UuidGenerator;
 
 import java.util.Map;
 import java.util.UUID;
 
 @Entity
-@Table(name = "shopping_cart")
+@Table(name = "Shopping_cart")
 @Getter
 @Setter
 @ToString
@@ -20,7 +19,6 @@ public class ShoppingCart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "cart_id", nullable = false, unique = true)
-    @UuidGenerator
     private UUID shoppingCartId;
     @Column(name = "username")
     private String username;
@@ -31,4 +29,11 @@ public class ShoppingCart {
     @Enumerated(EnumType.STRING)
     @Column(name = "shopping_cart_status")
     private ShoppingCartStatus shoppingCartStatus;
+
+    @PrePersist
+    public void generateShoppingCartId() {
+        if (shoppingCartId == null) {
+            shoppingCartId = UUID.randomUUID();
+        }
+    }
 }
