@@ -15,7 +15,6 @@ import ru.yandex.practicum.model.QuantityState;
 import ru.yandex.practicum.repository.StoreRepository;
 import ru.yandex.practicum.service.StoreService;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -74,10 +73,5 @@ public class StoreServiceImpl implements StoreService {
     public Page<Product> getListOfProducts(ProductCategory category,
                                            Pageable pageable) {
         return storeRepository.findByProductCategory(category, pageable);
-    }
-
-    @Loggable
-    public List<Product> getAllProductsFromList(List<UUID> productsId) {
-        return storeRepository.findAllById(productsId);
     }
 }
