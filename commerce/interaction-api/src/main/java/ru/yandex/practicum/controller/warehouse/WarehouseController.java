@@ -30,7 +30,7 @@ public interface WarehouseController {
     void shippedInDelivery(@RequestBody @Valid ShippedToDeliveryRequest request);
 
     @PostMapping("/return")
-    void returnProductsInWarehous(@RequestBody Map<@NotNull UUID, @PositiveOrZero Integer> products);
+    void returnProductsInWarehouse(@RequestBody Map<@NotNull UUID, @PositiveOrZero Integer> products);
 
     @PostMapping("assembly")
     BookedProductsDto assemblyProductsForDelivery(@RequestBody @Valid AssemblyProductsForOrderRequest request);
