@@ -13,6 +13,7 @@ import ru.yandex.practicum.dto.ProductCategoryDto;
 import ru.yandex.practicum.dto.ProductDto;
 import ru.yandex.practicum.dto.QuantityStateDto;
 
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -22,6 +23,11 @@ public class StoreControllerFallback implements StoreControllerFeign {
     public Page<ProductDto> getListOfProducts(@RequestParam ProductCategoryDto category,
                                               @PageableDefault(size = 20, sort = "productName",
                                                       direction = Sort.Direction.ASC) Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public List<ProductDto> getAllProductsFromList(@RequestBody List<UUID> productsId) {
         return null;
     }
 

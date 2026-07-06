@@ -15,14 +15,9 @@ import ru.yandex.practicum.dto.ProductCategoryDto;
 import ru.yandex.practicum.dto.ProductDto;
 import ru.yandex.practicum.dto.QuantityStateDto;
 import ru.yandex.practicum.logging.Loggable;
-import ru.yandex.practicum.model.Product;
-import ru.yandex.practicum.model.ProductCategory;
-import ru.yandex.practicum.model.QuantityState;
-import ru.yandex.practicum.model.mapper.ProductCategoryMapper;
-import ru.yandex.practicum.model.mapper.ProductMapper;
-import ru.yandex.practicum.model.mapper.QuantityStateMapper;
 import ru.yandex.practicum.service.StoreService;
 
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -32,34 +27,31 @@ import java.util.UUID;
 @Validated
 public class StoreControllerImpl implements StoreController {
     private final StoreService storeService;
-    private final ProductMapper productMapper;
-    private final ProductCategoryMapper productCategoryMapper;
-    private final QuantityStateMapper quantityStateMapper;
 
     @Loggable
     @GetMapping
     public Page<ProductDto> getListOfProducts(@RequestParam ProductCategoryDto category,
                                               @PageableDefault(size = 20, sort = "productName",
                                                       direction = Sort.Direction.ASC) Pageable pageable) {
-        ProductCategory productCategory = productCategoryMapper.toEntity(category);
-        Page<Product> products = storeService.getListOfProducts(productCategory, pageable);
-        return products.map(productMapper::toDto);
+        return storeService.getListOfProducts(category, pageable);
+    }
+
+    @Loggable
+    @PostMapping("/getAll")
+    public List<ProductDto> getAllProductsFromList(@RequestBody List<UUID> productsId) {
+        return storeService.getAllProductsFromList(productsId);
     }
 
     @Loggable
     @PutMapping
     public ProductDto createNewProduct(@RequestBody @Valid ProductDto dto) {
-        Product product = productMapper.toEntity(dto);
-        product = storeService.createNewProduct(product);
-        return productMapper.toDto(product);
+        return storeService.createNewProduct(dto);
     }
 
     @Loggable
     @PostMapping
     public ProductDto updateProductInfo(@RequestBody @Valid ProductDto dto) {
-        Product product = productMapper.toEntity(dto);
-        product = storeService.updateProduct(product);
-        return productMapper.toDto(product);
+        return storeService.updateProduct(dto);
     }
 
     @Loggable
@@ -72,15 +64,12 @@ public class StoreControllerImpl implements StoreController {
     @PostMapping("/quantityState")
     public ProductDto changeQuantityState(@RequestParam @NotNull UUID productId,
                                           @RequestParam QuantityStateDto quantityState) {
-        QuantityState state = quantityStateMapper.toEntity(quantityState);
-        Product product = storeService.changeQuantityState(productId, state);
-        return productMapper.toDto(product);
+        return storeService.changeQuantityState(productId, quantityState);
     }
 
     @Loggable
     @GetMapping("/{productId}")
     public ProductDto getProductInfo(@PathVariable @NotNull UUID productId) {
-        Product product = storeService.getProductInfo(productId);
-        return productMapper.toDto(product);
+        return storeService.getProductInfo(productId);
     }
 }

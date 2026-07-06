@@ -1,0 +1,132 @@
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: delivery_actuator_route
+          uri: lb://warehouse
+          predicates:
+            - Path=/delivery/actuator/**
+          filters:
+            - StripPrefix=1
+
+        - id: delivery_service_route
+          uri: lb://delivery
+          predicates:
+            - Path=/delivery/**
+          filters:
+            - PrefixPath=/api/v1
+
+
+
+        - id: order_actuator_route
+          uri: lb://order
+          predicates:
+            - Path=/order/actuator/**
+          filters:
+            - StripPrefix=1
+
+        - id: order_service_route
+          uri: lb://order
+          predicates:
+            - Path=/order/**
+          filters:
+            - PrefixPath=/api/v1
+
+
+
+        - id: payment_actuator_route
+          uri: lb://payment
+          predicates:
+            - Path=/payment/actuator/**
+          filters:
+            - StripPrefix=1
+
+        - id: payment_service_route
+          uri: lb://payment
+          predicates:
+            - Path=/payment/**
+          filters:
+            - PrefixPath=/api/v1
+
+
+
+        - id: shopping_cart_actuator_route
+          uri: lb://shopping-cart
+          predicates:
+            - Path=/shopping-cart/actuator/**
+          filters:
+            - StripPrefix=1
+
+        - id: shopping_cart_service_route
+          uri: lb://shopping-cart
+          predicates:
+            - Path=/shopping-cart/**
+          filters:
+            - PrefixPath=/api/v1
+
+
+
+        - id: shopping_store_actuator_route
+          uri: lb://shopping-store
+          predicates:
+            - Path=/shopping-store/actuator/**
+          filters:
+            - StripPrefix=1
+
+        - id: shopping_store_service_route
+          uri: lb://shopping-store
+          predicates:
+            - Path=/shopping-store/**
+          filters:
+            - PrefixPath=/api/v1
+
+
+
+        - id: warehouse_actuator_route
+          uri: lb://warehouse
+          predicates:
+            - Path=/warehouse/actuator/**
+          filters:
+            - StripPrefix=1
+
+        - id: warehouse_service_route
+          uri: lb://warehouse
+          predicates:
+            - Path=/warehouse/**
+          filters:
+            - PrefixPath=/api/v1
+
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: gateway,health,info
+  endpoint:
+    gateway:
+      enabled: true
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${server.port}
+    hostname: localhost
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+
+logging:
+  level:
+    com.netflix.discovery: DEBUG
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.cloud.gateway.handler: DEBUG
+    org.springframework.cloud.gateway.route: DEBUG
+    org.springframework.web.reactive: DEBUG

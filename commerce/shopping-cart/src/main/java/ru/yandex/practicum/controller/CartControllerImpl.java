@@ -28,41 +28,36 @@ public class CartControllerImpl implements CartController {
     private final WarehouseControllerFeign warehouseControllerFeign;
 
     @Loggable
-    @Override
     @GetMapping
     public ShoppingCartDto getShoppingCart(@RequestParam @NotNull String username) {
         return cartService.getUserProductCart(username);
     }
 
     @Loggable
-    @Override
     @PutMapping
     public ShoppingCartDto putProductInCart(@RequestParam @NotNull String username,
                                             @RequestBody Map<@NotNull UUID, @PositiveOrZero Integer> productCart) {
         ShoppingCartDto shoppingCartDto = ShoppingCartDto.builder()
                 .products(productCart)
                 .build();
-        warehouseControllerFeign.checkAvailableAllProductInShoppingCart(shoppingCartDto);
+        BookedProductsDto bookedProductsDto = warehouseControllerFeign.checkAvailableAllProductInShoppingCart(shoppingCartDto);
         return cartService.putProductInCart(username, productCart);
     }
 
     @Loggable
-    @Override
     @DeleteMapping
     public void deleteShoppingCart(@RequestParam @NotNull String username) {
         cartService.deleteShoppingCart(username);
     }
 
     @Loggable
-    @Override
     @PostMapping("/remove")
     public ShoppingCartDto removeProductFromCart(@RequestParam @NotNull String username,
-                                                 @RequestBody List<@NotNull UUID> products) {
-        return cartService.removeProductFromCart(username, products);
+                                                 @RequestBody List<@NotNull UUID> productId) {
+        return cartService.removeProductFromCart(username, productId);
     }
 
     @Loggable
-    @Override
     @PostMapping("/change-quantity")
     public ShoppingCartDto changeProductQuantityInCart(@RequestParam @NotNull String username,
                                                        @RequestBody ChangeProductQuantityRequest request) {

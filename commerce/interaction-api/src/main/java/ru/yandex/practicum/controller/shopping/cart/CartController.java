@@ -25,7 +25,7 @@ public interface CartController {
 
     @PostMapping("/remove")
     ShoppingCartDto removeProductFromCart(@RequestParam @NotNull String username,
-                                          @RequestBody List<@NotNull UUID> products);
+                                          @RequestBody List<@NotNull UUID> productId);
 
     @PostMapping("/change-quantity")
     ShoppingCartDto changeProductQuantityInCart(@RequestParam @NotNull String username,

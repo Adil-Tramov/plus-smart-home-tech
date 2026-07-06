@@ -61,22 +61,22 @@ public class CartServiceImpl implements CartService {
 
     @Loggable
     @Transactional
-    public ShoppingCartDto removeProductFromCart(String username, List<UUID> products) {
+    public ShoppingCartDto removeProductFromCart(String username, List<UUID> productId) {
         if (!cartRepository.existsByUsername(username)) {
             throw new NoProductsInShoppingCartException("Shopping cart with this product not exist");
         }
         ShoppingCart shoppingCart = cartRepository.findByUsername(username);
-        Map<UUID, Integer> productMap = shoppingCart.getProducts();
-        products.forEach(key -> {
-            if (productMap.containsKey(key)) {
-                productMap.remove(key);
+        Map<UUID, Integer> products = shoppingCart.getProducts();
+        productId.forEach(key -> {
+            if (products.containsKey(key)) {
+                products.remove(key);
             } else {
                 throw new NoProductsInShoppingCartException("Shopping cart with this product not exist");
             }
         });
-        shoppingCart.setProducts(productMap);
-        ShoppingCart savedCart = cartRepository.save(shoppingCart);
-        return shoppingCartMapper.toDto(savedCart);
+        shoppingCart.setProducts(products);
+        ShoppingCart updatedCart = cartRepository.save(shoppingCart);
+        return shoppingCartMapper.toDto(updatedCart);
     }
 
     @Loggable
@@ -93,7 +93,7 @@ public class CartServiceImpl implements CartService {
             throw new NoProductsInShoppingCartException("Shopping cart with this product not exist");
         }
         shoppingCart.setProducts(products);
-        ShoppingCart savedCart = cartRepository.save(shoppingCart);
-        return shoppingCartMapper.toDto(savedCart);
+        ShoppingCart updatedCart = cartRepository.save(shoppingCart);
+        return shoppingCartMapper.toDto(updatedCart);
     }
 }

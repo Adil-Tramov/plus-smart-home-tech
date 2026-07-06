@@ -7,10 +7,14 @@ import java.util.Map;
 import java.util.UUID;
 
 public interface CartService {
+
     ShoppingCartDto getUserProductCart(String username);
+
     ShoppingCartDto putProductInCart(String username, Map<UUID, Integer> products);
+
     void deleteShoppingCart(String username);
-    ShoppingCartDto removeProductFromCart(String username, List<UUID> products);
+
+    ShoppingCartDto removeProductFromCart(String username, List<UUID> productId);
+
     ShoppingCartDto changeQuantityInShoppingCart(String username, UUID productId, int newQuantity);
 }
-
