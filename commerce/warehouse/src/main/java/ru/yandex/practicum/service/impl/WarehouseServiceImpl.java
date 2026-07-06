@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.dto.AddressDto;
+import ru.yandex.practicum.dto.BookedProductsDto;
+import ru.yandex.practicum.dto.NewProductInWarehouseRequest;
 import ru.yandex.practicum.exception.NoSpecifiedProductInWarehouseException;
 import ru.yandex.practicum.exception.ProductInShoppingCartLowQuantityInWarehouse;
 import ru.yandex.practicum.exception.SpecifiedProductAlreadyInWarehouseException;
@@ -12,6 +15,9 @@ import ru.yandex.practicum.model.Address;
 import ru.yandex.practicum.model.BookedProducts;
 import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.model.ShippedDelivery;
+import ru.yandex.practicum.model.mapper.AddressMapper;
+import ru.yandex.practicum.model.mapper.BookedProductsMapper;
+import ru.yandex.practicum.model.mapper.ProductMapper;
 import ru.yandex.practicum.repository.ShippedRepository;
 import ru.yandex.practicum.repository.WarehouseRepository;
 import ru.yandex.practicum.service.WarehouseService;
@@ -25,9 +31,12 @@ import java.util.*;
 public class WarehouseServiceImpl implements WarehouseService {
     private final WarehouseRepository warehouseRepository;
     private final ShippedRepository shippedRepository;
+    private final ProductMapper productMapper;
+    private final AddressMapper addressMapper;
+    private final BookedProductsMapper bookedProductsMapper;
 
-    private final Random random = new Random();
-    private final Address[] addresses = new Address[]{
+    private static final Random RANDOM = new Random();
+    private static final Address[] ADDRESSES = new Address[]{
             Address.builder()
                     .country("ADDRESS_1")
                     .city("ADDRESS_1")
@@ -46,18 +55,20 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Loggable
     @Transactional
-    public Product saveProductInWarehouse(Product product) {
+    public void saveProductInWarehouse(NewProductInWarehouseRequest productDto) {
+        Product product = productMapper.toEntity(productDto);
         UUID id = product.getProductId();
         if (warehouseRepository.existsById(id)) {
             throw new SpecifiedProductAlreadyInWarehouseException("Product with ID: " + id + " already exists!");
         }
-        return warehouseRepository.save(product);
+        warehouseRepository.save(product);
     }
 
     @Loggable
-    public BookedProducts checkShoppingCart(Map<UUID, Integer> productsFromCart) {
+    public BookedProductsDto checkShoppingCart(Map<UUID, Integer> productsFromCart) {
         List<Product> productListFromWarehouse = checkAvailableAndGetListOfProducts(productsFromCart.keySet());
-        return createBookedProductsFromListOfProducts(productListFromWarehouse, productsFromCart);
+        BookedProducts bookedProducts = createBookedProductsFromListOfProducts(productListFromWarehouse, productsFromCart);
+        return bookedProductsMapper.toDto(bookedProducts);
     }
 
     @Loggable
@@ -70,13 +81,14 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Loggable
-    public Address getWarehouseAddress() {
-        return addresses[random.nextInt(addresses.length)];
+    public AddressDto getWarehouseAddress() {
+        Address address = ADDRESSES[RANDOM.nextInt(ADDRESSES.length)];
+        return addressMapper.toDto(address);
     }
 
     @Loggable
     @Transactional
-    public void returnProductsInWarehous(Map<UUID, Integer> products) {
+    public void returnProductsInWarehouse(Map<UUID, Integer> products) {
         List<Product> productListFromWarehouse = checkAvailableAndGetListOfProducts(products.keySet());
         productListFromWarehouse.forEach(product -> {
             product.setQuantity(product.getQuantity() + products.get(product.getProductId()));
@@ -86,14 +98,14 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Loggable
     @Transactional
-    public BookedProducts assemblyProductsForDelivery(Map<UUID, Integer> products) {
+    public BookedProductsDto assemblyProductsForDelivery(Map<UUID, Integer> products) {
         List<Product> productListFromWarehouse = checkAvailableAndGetListOfProducts(products.keySet());
         BookedProducts bookedProducts = createBookedProductsFromListOfProducts(productListFromWarehouse, products);
         productListFromWarehouse.forEach(product -> {
             product.setQuantity(product.getQuantity() - products.get(product.getProductId()));
         });
         warehouseRepository.saveAll(productListFromWarehouse);
-        return bookedProducts;
+        return bookedProductsMapper.toDto(bookedProducts);
     }
 
     @Loggable

@@ -1,23 +1,22 @@
 package ru.yandex.practicum.service;
 
-
+import ru.yandex.practicum.dto.DeliveryDto;
 import ru.yandex.practicum.dto.OrderDto;
-import ru.yandex.practicum.model.Delivery;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 public interface DeliveryService {
 
-    Delivery createNewDelivery(Delivery dto);
+    DeliveryDto createNewDelivery(DeliveryDto deliveryDto);
 
-    Delivery successfulDelivery(UUID id);
+    DeliveryDto successfulDelivery(UUID id);
 
-    Delivery pickedDelivery(UUID id);
+    DeliveryDto pickedDelivery(UUID id);
 
-    Delivery failedDelivery(UUID id);
+    DeliveryDto failedDelivery(UUID id);
 
-    BigDecimal calculateDeliveryCost(OrderDto orderDto);
+    DeliveryDto findByDeliveryId(UUID id);
 
-    Delivery findByDeliveryId(UUID id);
+    BigDecimal calculateDeliveryCost(OrderDto order);
 }

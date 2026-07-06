@@ -6,12 +6,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.dto.ProductCategoryDto;
+import ru.yandex.practicum.dto.ProductDto;
+import ru.yandex.practicum.dto.QuantityStateDto;
 import ru.yandex.practicum.exception.ProductNotFoundException;
 import ru.yandex.practicum.logging.Loggable;
 import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.model.ProductCategory;
 import ru.yandex.practicum.model.ProductState;
 import ru.yandex.practicum.model.QuantityState;
+import ru.yandex.practicum.model.mapper.ProductCategoryMapper;
+import ru.yandex.practicum.model.mapper.ProductMapper;
+import ru.yandex.practicum.model.mapper.QuantityStateMapper;
 import ru.yandex.practicum.repository.StoreRepository;
 import ru.yandex.practicum.service.StoreService;
 
@@ -25,30 +31,39 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class StoreServiceImpl implements StoreService {
     private final StoreRepository storeRepository;
+    private final ProductMapper productMapper;
+    private final ProductCategoryMapper productCategoryMapper;
+    private final QuantityStateMapper quantityStateMapper;
 
     @Loggable
     @Transactional
-    public Product createNewProduct(Product product) {
-        return storeRepository.save(product);
+    public ProductDto createNewProduct(ProductDto productDto) {
+        Product product = productMapper.toEntity(productDto);
+        Product savedProduct = storeRepository.save(product);
+        return productMapper.toDto(savedProduct);
     }
 
     @Loggable
     @Transactional
-    public Product updateProduct(Product product) {
-        if (storeRepository.existsById(product.getProductId())) {
-            return storeRepository.save(product);
+    public ProductDto updateProduct(ProductDto productDto) {
+        if (storeRepository.existsById(productDto.getProductId())) {
+            Product product = productMapper.toEntity(productDto);
+            Product updatedProduct = storeRepository.save(product);
+            return productMapper.toDto(updatedProduct);
         } else {
-            throw new ProductNotFoundException("Product with ID: " + product.getProductId() + "don't present");
+            throw new ProductNotFoundException("Product with ID: " + productDto.getProductId() + " don't present");
         }
     }
 
     @Loggable
     @Transactional
-    public Product changeQuantityState(UUID productId, QuantityState quantityState) {
+    public ProductDto changeQuantityState(UUID productId, QuantityStateDto quantityStateDto) {
         Product product = storeRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Not found product with ID: " + productId));
+        QuantityState quantityState = quantityStateMapper.toEntity(quantityStateDto);
         product.setQuantityState(quantityState);
-        return storeRepository.save(product);
+        Product updatedProduct = storeRepository.save(product);
+        return productMapper.toDto(updatedProduct);
     }
 
     @Loggable
@@ -58,26 +73,32 @@ public class StoreServiceImpl implements StoreService {
         if (productOptional.isPresent()) {
             Product product = productOptional.get();
             product.setProductState(ProductState.DEACTIVATE);
+            storeRepository.save(product);
             return true;
         } else {
-            throw new ProductNotFoundException("Product with ID: " + productId + "don't present");
+            throw new ProductNotFoundException("Product with ID: " + productId + " don't present");
         }
     }
 
     @Loggable
-    public Product getProductInfo(UUID id) {
-        return storeRepository.findById(id)
+    public ProductDto getProductInfo(UUID id) {
+        Product product = storeRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Not found product with ID: " + id));
+        return productMapper.toDto(product);
     }
 
     @Loggable
-    public Page<Product> getListOfProducts(ProductCategory category,
-                                           Pageable pageable) {
-        return storeRepository.findByProductCategory(category, pageable);
+    public Page<ProductDto> getListOfProducts(ProductCategoryDto categoryDto, Pageable pageable) {
+        ProductCategory category = productCategoryMapper.toEntity(categoryDto);
+        Page<Product> products = storeRepository.findByProductCategory(category, pageable);
+        return products.map(productMapper::toDto);
     }
 
     @Loggable
-    public List<Product> getAllProductsFromList(List<UUID> productsId) {
-        return storeRepository.findAllById(productsId);
+    public List<ProductDto> getAllProductsFromList(List<UUID> productsId) {
+        List<Product> products = storeRepository.findAllById(productsId);
+        return products.stream()
+                .map(productMapper::toDto)
+                .toList();
     }
 }

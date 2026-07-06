@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.dto.ShoppingCartDto;
 import ru.yandex.practicum.exception.NoProductsInShoppingCartException;
 import ru.yandex.practicum.logging.Loggable;
 import ru.yandex.practicum.model.ShoppingCart;
 import ru.yandex.practicum.model.ShoppingCartStatus;
+import ru.yandex.practicum.model.mapper.ShoppingCartMapper;
 import ru.yandex.practicum.repository.CartRepository;
 import ru.yandex.practicum.service.CartService;
 
@@ -22,18 +24,20 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
+    private final ShoppingCartMapper shoppingCartMapper;
 
     @Loggable
-    public ShoppingCart getUserProductCart(String username) {
+    public ShoppingCartDto getUserProductCart(String username) {
         if (!cartRepository.existsByUsername(username)) {
             throw new NoProductsInShoppingCartException("Shopping cart with this product not exist");
         }
-        return cartRepository.findByUsername(username);
+        ShoppingCart shoppingCart = cartRepository.findByUsername(username);
+        return shoppingCartMapper.toDto(shoppingCart);
     }
 
     @Loggable
     @Transactional
-    public ShoppingCart putProductInCart(String username, Map<UUID, Integer> products) {
+    public ShoppingCartDto putProductInCart(String username, Map<UUID, Integer> products) {
         ShoppingCart shoppingCart = cartRepository
                 .findByUsernameAndShoppingCartStatus(username, ShoppingCartStatus.ACTIVATE)
                 .orElseGet(() -> ShoppingCart.builder()
@@ -42,7 +46,8 @@ public class CartServiceImpl implements CartService {
                         .products(new HashMap<>())
                         .build());
         shoppingCart.getProducts().putAll(products);
-        return cartRepository.save(shoppingCart);
+        ShoppingCart savedCart = cartRepository.save(shoppingCart);
+        return shoppingCartMapper.toDto(savedCart);
     }
 
     @Loggable
@@ -56,7 +61,7 @@ public class CartServiceImpl implements CartService {
 
     @Loggable
     @Transactional
-    public ShoppingCart removeProductFromCart(String username, List<UUID> productId) {
+    public ShoppingCartDto removeProductFromCart(String username, List<UUID> productId) {
         if (!cartRepository.existsByUsername(username)) {
             throw new NoProductsInShoppingCartException("Shopping cart with this product not exist");
         }
@@ -70,12 +75,13 @@ public class CartServiceImpl implements CartService {
             }
         });
         shoppingCart.setProducts(products);
-        return cartRepository.save(shoppingCart);
+        ShoppingCart updatedCart = cartRepository.save(shoppingCart);
+        return shoppingCartMapper.toDto(updatedCart);
     }
 
     @Loggable
     @Transactional
-    public ShoppingCart changeQuantityInShoppingCart(String username, UUID productId, int newQuantity) {
+    public ShoppingCartDto changeQuantityInShoppingCart(String username, UUID productId, int newQuantity) {
         if (!cartRepository.existsByUsername(username)) {
             throw new NoProductsInShoppingCartException("Shopping cart with this product not exist");
         }
@@ -87,6 +93,7 @@ public class CartServiceImpl implements CartService {
             throw new NoProductsInShoppingCartException("Shopping cart with this product not exist");
         }
         shoppingCart.setProducts(products);
-        return cartRepository.save(shoppingCart);
+        ShoppingCart updatedCart = cartRepository.save(shoppingCart);
+        return shoppingCartMapper.toDto(updatedCart);
     }
 }

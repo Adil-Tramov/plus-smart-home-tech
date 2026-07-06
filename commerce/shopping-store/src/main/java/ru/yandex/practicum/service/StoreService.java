@@ -2,27 +2,26 @@ package ru.yandex.practicum.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import ru.yandex.practicum.model.Product;
-import ru.yandex.practicum.model.ProductCategory;
-import ru.yandex.practicum.model.QuantityState;
+import ru.yandex.practicum.dto.ProductCategoryDto;
+import ru.yandex.practicum.dto.ProductDto;
+import ru.yandex.practicum.dto.QuantityStateDto;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface StoreService {
 
-    Product createNewProduct(Product product);
+    ProductDto createNewProduct(ProductDto productDto);
 
-    Product updateProduct(Product product);
+    ProductDto updateProduct(ProductDto productDto);
 
     boolean deleteProduct(UUID productId);
 
-    Product getProductInfo(UUID id);
+    ProductDto getProductInfo(UUID id);
 
-    Product changeQuantityState(UUID productId, QuantityState quantityState);
+    ProductDto changeQuantityState(UUID productId, QuantityStateDto quantityState);
 
-    Page<Product> getListOfProducts(ProductCategory category,
-                                    Pageable pageable);
+    Page<ProductDto> getListOfProducts(ProductCategoryDto category, Pageable pageable);
 
-    List<Product> getAllProductsFromList(List<UUID> productsId);
+    List<ProductDto> getAllProductsFromList(List<UUID> productsId);
 }

@@ -14,9 +14,6 @@ import ru.yandex.practicum.controller.payment.feign.PaymentControllerFeign;
 import ru.yandex.practicum.controller.warehouse.feign.WarehouseControllerFeign;
 import ru.yandex.practicum.dto.*;
 import ru.yandex.practicum.logging.Loggable;
-import ru.yandex.practicum.model.Order;
-import ru.yandex.practicum.model.State;
-import ru.yandex.practicum.model.mapper.OrderMapper;
 import ru.yandex.practicum.service.OrderService;
 
 import java.math.BigDecimal;
@@ -29,7 +26,6 @@ import java.util.UUID;
 @Validated
 public class OrderControllerImpl implements OrderController {
     private final OrderService orderService;
-    private final OrderMapper orderMapper;
     private final PaymentControllerFeign paymentControllerFeign;
     private final WarehouseControllerFeign warehouseControllerFeign;
     private final DeliveryControllerFeign deliveryControllerFeign;
@@ -39,8 +35,7 @@ public class OrderControllerImpl implements OrderController {
     public Page<OrderDto> getAllUserOrders(@RequestParam String username,
                                            @PageableDefault(size = 20, sort = "state",
                                                    direction = Sort.Direction.ASC) Pageable pageable) {
-        Page<Order> orders = orderService.getAllUserOrders(username, pageable);
-        return orders.map(orderMapper::toDto);
+        return orderService.getAllUserOrders(username, pageable);
     }
 
     @Loggable
@@ -48,21 +43,20 @@ public class OrderControllerImpl implements OrderController {
     public OrderDto createNewOrder(@RequestBody CreateNewOrderRequest newOrder) {
         BookedProductsDto bookedProductsDto =
                 warehouseControllerFeign.checkAvailableAllProductInShoppingCart(newOrder.getShoppingCartDto());
-        AddressDto warehousAddress = warehouseControllerFeign.getWarehouseAddress();
+        AddressDto warehouseAddress = warehouseControllerFeign.getWarehouseAddress();
 
         DeliveryDto deliveryDto = DeliveryDto.builder()
                 .toAddress(newOrder.getAddressDto())
-                .fromAddress(warehousAddress)
+                .fromAddress(warehouseAddress)
                 .orderId(UUID.randomUUID())
                 .build();
         deliveryDto = deliveryControllerFeign.createNewDelivery(deliveryDto);
 
-        Order order = orderService.createNewOrder(newOrder,
+        OrderDto orderDto = orderService.createNewOrder(newOrder,
                 bookedProductsDto,
                 deliveryDto.getOrderId(),
                 deliveryDto.getDeliveryId());
 
-        OrderDto orderDto = orderMapper.toDto(order);
         paymentControllerFeign.createPayment(orderDto);
 
         return orderDto;
@@ -71,85 +65,70 @@ public class OrderControllerImpl implements OrderController {
     @Loggable
     @PostMapping("/return")
     public OrderDto returnProducts(@RequestBody ProductReturnRequest request) {
-        Order order = orderService.getOrderById(request.getOrderId());
-        warehouseControllerFeign.returnProductsInWarehous(request.getProducts());
-        order.setState(State.CANCELED);
-        order = orderService.updateOrder(order);
-        return orderMapper.toDto(order);
+        OrderDto orderDto = orderService.getOrderById(request.getOrderId());
+        warehouseControllerFeign.returnProductsInWarehouse(request.getProducts()); 
+        orderDto.setState(StateDto.CANCELED);
+        return orderService.updateOrder(orderDto);
     }
 
     @Loggable
     @PostMapping("/calculate/total")
     public OrderDto calculateTotalCost(@RequestBody UUID orderId) {
-        Order order = orderService.getOrderById(orderId);
-        OrderDto orderDto = orderMapper.toDto(order);
+        OrderDto orderDto = orderService.getOrderById(orderId);
 
         BigDecimal totalPrice = paymentControllerFeign.calculateTotalCost(orderDto);
-        order.setTotalPrice(totalPrice);
-        order = orderService.updateOrder(order);
-
-        return orderMapper.toDto(order);
+        orderDto.setTotalPrice(totalPrice);
+        return orderService.updateOrder(orderDto);
     }
 
     @Loggable
     @PostMapping("/calculate/delivery")
     public OrderDto calculateDeliveryCost(@RequestBody UUID orderId) {
-        Order order = orderService.getOrderById(orderId);
-
-        OrderDto orderDto = orderMapper.toDto(order);
+        OrderDto orderDto = orderService.getOrderById(orderId);
         BigDecimal deliveryCost = deliveryControllerFeign.deliveryCostCalculation(orderDto);
-
-        order.setDeliveryPrice(deliveryCost);
-        order = orderService.updateOrder(order);
-        return orderMapper.toDto(order);
+        orderDto.setDeliveryPrice(deliveryCost);
+        return orderService.updateOrder(orderDto);
     }
 
     @Loggable
     @PostMapping("/payment")
     public OrderDto payForOrder(@RequestBody UUID orderId) {
-        Order order = orderService.payForOrder(orderId);
-        return orderMapper.toDto(order);
+        return orderService.payForOrder(orderId);
     }
 
     @Loggable
     @PostMapping("/payment/failed")
     public OrderDto failedPayForOrder(@RequestBody UUID orderId) {
-        Order order = orderService.failedPayForOrder(orderId);
-        return orderMapper.toDto(order);
+        return orderService.failedPayForOrder(orderId);
     }
 
     @Loggable
     @PostMapping("/delivery")
     public OrderDto orderDelivered(@RequestBody UUID orderId) {
-        Order order = orderService.orderDelivered(orderId);
-        return orderMapper.toDto(order);
+        return orderService.orderDelivered(orderId);
     }
 
     @Loggable
     @PostMapping("/delivery/failed")
     public OrderDto failedOrderDelivered(@RequestBody UUID orderId) {
-        Order order = orderService.failedOrderDelivered(orderId);
-        return orderMapper.toDto(order);
+        return orderService.failedOrderDelivered(orderId);
     }
 
     @Loggable
     @PostMapping("/completed")
     public OrderDto completeOrder(@RequestBody UUID orderId) {
-        Order order = orderService.completeOrder(orderId);
-        return orderMapper.toDto(order);
+        return orderService.completeOrder(orderId);
     }
 
     @Loggable
     @PostMapping("/assembly")
     public OrderDto assemblyOrder(@RequestBody UUID orderId) {
-        Order order = orderService.assemblyOrder(orderId);
-        return orderMapper.toDto(order);
+        return orderService.assemblyOrder(orderId);
     }
 
     @Loggable
     @PostMapping("/assembly/failed")
     public OrderDto failedAssemblyOrder(@RequestBody UUID orderId) {
-        Order order = orderService.failedAssemblyOrder(orderId);
-        return orderMapper.toDto(order);
+        return orderService.failedAssemblyOrder(orderId);
     }
 }

@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.dto.DeliveryDto;
 import ru.yandex.practicum.dto.OrderDto;
 import ru.yandex.practicum.exception.NoDeliveryFoundException;
 import ru.yandex.practicum.logging.Loggable;
 import ru.yandex.practicum.model.Delivery;
 import ru.yandex.practicum.model.DeliveryState;
+import ru.yandex.practicum.model.mapper.DeliveryMapper;
 import ru.yandex.practicum.repository.DeliveryRepository;
 import ru.yandex.practicum.service.DeliveryService;
 
@@ -22,39 +24,45 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class DeliveryServiceImpl implements DeliveryService {
     private final DeliveryRepository deliveryRepository;
+    private final DeliveryMapper deliveryMapper;
 
     @Loggable
     @Transactional
-    public Delivery createNewDelivery(Delivery delivery) {
+    public DeliveryDto createNewDelivery(DeliveryDto deliveryDto) {
+        Delivery delivery = deliveryMapper.toEntity(deliveryDto);
         delivery.setDeliveryState(DeliveryState.CREATED);
-        return deliveryRepository.save(delivery);
+        Delivery savedDelivery = deliveryRepository.save(delivery);
+        return deliveryMapper.toDto(savedDelivery);
     }
 
     @Loggable
     @Transactional
-    public Delivery successfulDelivery(UUID id) {
+    public DeliveryDto successfulDelivery(UUID id) {
         Delivery delivery = deliveryRepository.findById(id)
-                .orElseThrow(() -> new NoDeliveryFoundException("Deliver with ID: " + id + "does not exist"));
+                .orElseThrow(() -> new NoDeliveryFoundException("Delivery with ID: " + id + " does not exist"));
         delivery.setDeliveryState(DeliveryState.IN_PROGRESS);
-        return deliveryRepository.save(delivery);
+        Delivery savedDelivery = deliveryRepository.save(delivery);
+        return deliveryMapper.toDto(savedDelivery);
     }
 
     @Loggable
     @Transactional
-    public Delivery pickedDelivery(UUID id) {
+    public DeliveryDto pickedDelivery(UUID id) {
         Delivery delivery = deliveryRepository.findById(id)
-                .orElseThrow(() -> new NoDeliveryFoundException("Deliver with ID: " + id + "does not exist"));
+                .orElseThrow(() -> new NoDeliveryFoundException("Delivery with ID: " + id + " does not exist"));
         delivery.setDeliveryState(DeliveryState.DELIVERED);
-        return deliveryRepository.save(delivery);
+        Delivery savedDelivery = deliveryRepository.save(delivery);
+        return deliveryMapper.toDto(savedDelivery);
     }
 
     @Loggable
     @Transactional
-    public Delivery failedDelivery(UUID id) {
+    public DeliveryDto failedDelivery(UUID id) {
         Delivery delivery = deliveryRepository.findById(id)
-                .orElseThrow(() -> new NoDeliveryFoundException("Deliver with ID: " + id + "does not exist"));
+                .orElseThrow(() -> new NoDeliveryFoundException("Delivery with ID: " + id + " does not exist"));
         delivery.setDeliveryState(DeliveryState.FAILED);
-        return deliveryRepository.save(delivery);
+        Delivery savedDelivery = deliveryRepository.save(delivery);
+        return deliveryMapper.toDto(savedDelivery);
     }
 
     @Loggable
@@ -93,8 +101,9 @@ public class DeliveryServiceImpl implements DeliveryService {
     }
 
     @Loggable
-    public Delivery findByDeliveryId(UUID id) {
-        return deliveryRepository.findById(id)
-                .orElseThrow(() -> new NoDeliveryFoundException("Deliver with ID: " + id + "does not exist"));
+    public DeliveryDto findByDeliveryId(UUID id) {
+        Delivery delivery = deliveryRepository.findById(id)
+                .orElseThrow(() -> new NoDeliveryFoundException("Delivery with ID: " + id + " does not exist"));
+        return deliveryMapper.toDto(delivery);
     }
 }

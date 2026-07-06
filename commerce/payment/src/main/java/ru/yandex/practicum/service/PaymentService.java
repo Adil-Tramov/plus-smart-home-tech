@@ -1,7 +1,7 @@
 package ru.yandex.practicum.service;
 
+import ru.yandex.practicum.dto.PaymentDto;
 import ru.yandex.practicum.dto.ProductDto;
-import ru.yandex.practicum.model.Payment;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -10,8 +10,7 @@ import java.util.UUID;
 
 public interface PaymentService {
 
-
-    Payment createPayment(Payment payment);
+    PaymentDto createPayment(PaymentDto paymentDto);
 
     BigDecimal calculateTotalCost(BigDecimal deliveryPrice, BigDecimal productsPrice);
 

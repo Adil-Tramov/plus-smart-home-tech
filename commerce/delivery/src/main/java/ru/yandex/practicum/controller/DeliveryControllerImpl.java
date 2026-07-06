@@ -9,8 +9,6 @@ import ru.yandex.practicum.controller.delivery.DeliveryController;
 import ru.yandex.practicum.dto.DeliveryDto;
 import ru.yandex.practicum.dto.OrderDto;
 import ru.yandex.practicum.logging.Loggable;
-import ru.yandex.practicum.model.Delivery;
-import ru.yandex.practicum.model.mapper.DeliveryMapper;
 import ru.yandex.practicum.service.impl.DeliveryServiceImpl;
 
 import java.math.BigDecimal;
@@ -22,35 +20,29 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DeliveryControllerImpl implements DeliveryController {
     private final DeliveryServiceImpl deliveryService;
-    private final DeliveryMapper deliveryMapper;
 
     @Loggable
     @PutMapping
     public DeliveryDto createNewDelivery(@RequestBody @Valid DeliveryDto deliveryDto) {
-        Delivery delivery = deliveryMapper.toEntity(deliveryDto);
-        delivery = deliveryService.createNewDelivery(delivery);
-        return deliveryMapper.toDto(delivery);
+        return deliveryService.createNewDelivery(deliveryDto);
     }
 
     @Loggable
     @PostMapping("/successful")
     public DeliveryDto successfulDelivery(@RequestBody UUID deliveryId) {
-        Delivery delivery = deliveryService.successfulDelivery(deliveryId);
-        return deliveryMapper.toDto(delivery);
+        return deliveryService.successfulDelivery(deliveryId);
     }
 
     @Loggable
     @PostMapping("/picked")
     public DeliveryDto pickedDelivery(@RequestBody UUID deliveryId) {
-        Delivery delivery = deliveryService.pickedDelivery(deliveryId);
-        return deliveryMapper.toDto(delivery);
+        return deliveryService.pickedDelivery(deliveryId);
     }
 
     @Loggable
     @PostMapping("/failed")
     public DeliveryDto failedDelivery(@RequestBody UUID deliveryId) {
-        Delivery delivery = deliveryService.failedDelivery(deliveryId);
-        return deliveryMapper.toDto(delivery);
+        return deliveryService.failedDelivery(deliveryId);
     }
 
     @Loggable

@@ -5,12 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
+import ru.yandex.practicum.dto.PaymentDto;
 import ru.yandex.practicum.dto.ProductDto;
 import ru.yandex.practicum.exception.NoOrderFoundException;
 import ru.yandex.practicum.exception.NotEnoughInfoInOrderToCalculateException;
 import ru.yandex.practicum.logging.Loggable;
 import ru.yandex.practicum.model.Payment;
 import ru.yandex.practicum.model.PaymentStatus;
+import ru.yandex.practicum.model.mapper.PaymentMapper;
 import ru.yandex.practicum.repository.PaymentRepository;
 import ru.yandex.practicum.service.PaymentService;
 
@@ -25,11 +27,14 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
+    private final PaymentMapper paymentMapper;
 
     @Loggable
     @Transactional
-    public Payment createPayment(Payment payment) {
-        return paymentRepository.save(payment);
+    public PaymentDto createPayment(PaymentDto paymentDto) {
+        Payment payment = paymentMapper.toEntity(paymentDto);
+        Payment savedPayment = paymentRepository.save(payment);
+        return paymentMapper.toDto(savedPayment);
     }
 
     @Loggable

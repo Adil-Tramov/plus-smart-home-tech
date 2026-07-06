@@ -11,11 +11,9 @@ import ru.yandex.practicum.controller.payment.PaymentController;
 import ru.yandex.practicum.controller.shopping.store.feign.StoreControllerFeign;
 import ru.yandex.practicum.dto.OrderDto;
 import ru.yandex.practicum.dto.PaymentDto;
+import ru.yandex.practicum.dto.PaymentStatusDto;
 import ru.yandex.practicum.dto.ProductDto;
 import ru.yandex.practicum.logging.Loggable;
-import ru.yandex.practicum.model.Payment;
-import ru.yandex.practicum.model.PaymentStatus;
-import ru.yandex.practicum.model.mapper.PaymentMapper;
 import ru.yandex.practicum.service.PaymentService;
 
 import java.math.BigDecimal;
@@ -29,21 +27,19 @@ import java.util.UUID;
 @Validated
 public class PaymentControllerImpl implements PaymentController {
     private final PaymentService paymentService;
-    private final PaymentMapper paymentMapper;
     private final StoreControllerFeign storeControllerFeign;
 
     @Loggable
     @PostMapping
     public PaymentDto createPayment(@RequestBody OrderDto order) {
-        Payment payment = Payment.builder()
+        PaymentDto paymentDto = PaymentDto.builder()
                 .paymentId(order.getPaymentId())
                 .totalPayment(order.getTotalPrice())
                 .deliveryTotal(order.getDeliveryPrice())
                 .feeTotal(order.getTotalPrice().subtract(order.getDeliveryPrice()).subtract(order.getProductPrice()))
-                .paymentStatus(PaymentStatus.PENDING)
+                .paymentStatusDto(PaymentStatusDto.PENDING)
                 .build();
-        payment = paymentService.createPayment(payment);
-        return paymentMapper.toDto(payment);
+        return paymentService.createPayment(paymentDto);
     }
 
     @Loggable

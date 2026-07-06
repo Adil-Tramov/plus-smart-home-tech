@@ -4,34 +4,34 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import ru.yandex.practicum.dto.BookedProductsDto;
 import ru.yandex.practicum.dto.CreateNewOrderRequest;
-import ru.yandex.practicum.model.Order;
+import ru.yandex.practicum.dto.OrderDto;
 
 import java.util.UUID;
 
 public interface OrderService {
 
-    Page<Order> getAllUserOrders(String username, Pageable pageable);
+    Page<OrderDto> getAllUserOrders(String username, Pageable pageable);
 
-    Order createNewOrder(CreateNewOrderRequest newOrder,
-                         BookedProductsDto bookedProducts,
-                         UUID orderId,
-                         UUID deliveryId);
+    OrderDto createNewOrder(CreateNewOrderRequest newOrder,
+                            BookedProductsDto bookedProducts,
+                            UUID orderId,
+                            UUID deliveryId);
 
-    Order updateOrder(Order order);
+    OrderDto updateOrder(OrderDto orderDto);
 
-    Order payForOrder(UUID orderId);
+    OrderDto payForOrder(UUID orderId);
 
-    Order failedPayForOrder(UUID orderId);
+    OrderDto failedPayForOrder(UUID orderId);
 
-    Order orderDelivered(UUID orderId);
+    OrderDto orderDelivered(UUID orderId);
 
-    Order failedOrderDelivered(UUID orderId);
+    OrderDto failedOrderDelivered(UUID orderId);
 
-    Order completeOrder(UUID orderId);
+    OrderDto completeOrder(UUID orderId);
 
-    Order assemblyOrder(UUID orderId);
+    OrderDto assemblyOrder(UUID orderId);
 
-    Order failedAssemblyOrder(UUID orderId);
+    OrderDto failedAssemblyOrder(UUID orderId);
 
-    Order getOrderById(UUID orderId);
+    OrderDto getOrderById(UUID orderId);
 }
