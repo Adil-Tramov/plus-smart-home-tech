@@ -49,7 +49,7 @@ public class WarehouseControllerFallback implements WarehouseControllerFeign {
     }
 
     @Override
-    public void returnProductsInWarehous(@RequestBody Map<@NotNull UUID, @PositiveOrZero Integer> products) {
+    public void returnProductsInWarehouse(@RequestBody Map<@NotNull UUID, @PositiveOrZero Integer> products) {
         throw new ProductInShoppingCartLowQuantityInWarehouse("Check error");
     }
 
